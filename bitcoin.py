@@ -6,14 +6,14 @@ import math
 import sys
 
 
-# The path to the data folder should be given as input
+# The path to the data folder is given as input
 if len(sys.argv) != 2:
     print('bitcoin.py <path to data folder>')
     sys.exit(1)
 data_path = sys.argv[1]
 
 
-# Reading the vectors from the given csv files
+# Read vectors from the given csv files
 train1_90 = pd.read_csv(data_path+'/train1_90.csv')
 train1_180 = pd.read_csv(data_path+'/train1_180.csv')
 train1_360 = pd.read_csv(data_path+'/train1_360.csv')
@@ -29,24 +29,21 @@ test_360 = pd.read_csv(data_path+'/test_360.csv')
 
 def computeDelta(wt, X, Xi):
     """
-    This function computes equation 6 of the paper, but with the euclidean distance 
-    replaced by the similarity function given in Equation 9.
-
     Parameters
     ----------
     wt : int
-        This is the constant c at the top of the right column on page 4.
+        This is the constant c.
     X : A row of Panda Dataframe
-        Corresponds to (x, y) in Equation 6.
+        Corresponds to (x, y).
     Xi : Panda Dataframe
-        Corresponds to a dataframe of (xi, yi) in Equation 6.
+        Corresponds to a dataframe of (xi, yi).
 
     Returns
     -------
     float
-        The output of equation 6, a prediction of the average price change.
+        A prediction of the average price change.
     """
-    # YOUR CODE GOES HERE
+    
     def vector_similarity(a, b):
         numer_term = 0
         mean_a = sum(a)/len(a)
@@ -57,7 +54,6 @@ def computeDelta(wt, X, Xi):
         return (numer_term/(len(a) * np.std(a) * np.std(b)))
     
     
-    #equation 6
     num, den = 0, 0
     X_ = X.iloc[0:len(X) - 1]
     
@@ -71,9 +67,9 @@ def computeDelta(wt, X, Xi):
 
 
 
-# Perform the Bayesian Regression to predict the average price change for each dataset of train2 using train1 as input. 
-# These will be used to estimate the coefficients (w0, w1, w2, and w3) in equation 8.
-weight = 2  # This constant was not specified in the paper, but we will use 2.
+# Bayesian Regression to predict the average price change for each dataset of train2 using train1 as input. 
+# These will be used to estimate the coefficients (w0, w1, w2, and w3).
+weight = 2
 trainDeltaP90 = np.empty(0)
 trainDeltaP180 = np.empty(0)
 trainDeltaP360 = np.empty(0)
@@ -99,20 +95,12 @@ trainData = pd.DataFrame(d)
 
 
 # Feed the data: [deltaP, deltaP90, deltaP180, deltaP360] to train the linear model. 
-# Use the statsmodels ols function.
-# Use the variable name model for your fitted model
-# YOUR CODE HERE
-#referenced the statsmodels website provided in the pdf
 olsmodel = smf.ols(formula = 'deltaP ~ deltaP90 + deltaP180 + deltaP360', data = trainData)
 model = olsmodel.fit()
-
-# Print the weights from the model
 print(model.params)
 
 
-# Perform the Bayesian Regression to predict the average price change for each dataset of test using train1 as input.
-# This should be similar to above where it was computed for train2.
-# YOUR CODE HERE
+# Perform Bayesian Regression to predict the average price change for each dataset of test using train1 as input.
 testDeltaP90 = np.empty(0)
 testDeltaP180 = np.empty(0)
 testDeltaP360 = np.empty(0)
@@ -124,7 +112,6 @@ for i in range(0,len(train1_360.index)) :
   testDeltaP360 = np.append(testDeltaP360, computeDelta(weight,test_360.iloc[i],train1_360))
 
 # Actual deltaP values for test data.
-# YOUR CODE HERE (use the right variable names so the below code works)
 testDeltaP = np.asarray(test_360[['Yi']])
 testDeltaP = np.reshape(testDeltaP, -1)
 
@@ -145,9 +132,7 @@ compareDF = pd.DataFrame(compare)
 
 
 # Compute the MSE and print the result
-# HINT: consider using the sm.mean_squared_error function
 MSE = 0.0
-# YOUR CODE HERE
 MSE = sm.mean_squared_error(testDeltaP, result)
 
 print("The MSE is %f" % (MSE))
