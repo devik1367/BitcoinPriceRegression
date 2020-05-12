@@ -1,5 +1,4 @@
 # BitcoinPriceRegression
-CSC591: ADBI - Homework Assignment
 
 Objective: 
 Use Bayesian Regression to predict the future price variation in the price of bitcoin.
